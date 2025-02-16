@@ -11,7 +11,7 @@ interface TypeWriterProps {
 
 export default function TypeWriter({ 
   text, 
-  delay = 50, 
+  delay = 10, 
   className = "", 
   onComplete 
 }: TypeWriterProps) {
@@ -32,7 +32,6 @@ export default function TypeWriter({
   }, [currentIndex, delay, text, onComplete]);
 
   useEffect(() => {
-    // Reset when text changes
     setCurrentText("");
     setCurrentIndex(0);
   }, [text]);

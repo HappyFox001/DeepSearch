@@ -1,4 +1,3 @@
-// 定义响应数据的接口
 export interface SearchResponse {
     status: 'success' | 'error';
     original_question: string;

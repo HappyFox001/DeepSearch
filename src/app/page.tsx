@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { InformationSearchAPI, SearchResponse } from './services/api';
 import TypeWriter from './components/TypeWriter';
 
@@ -17,16 +17,18 @@ export default function Home() {
     finalAnswer: false
   });
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = [
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
+  
+  const steps = useMemo(() => [
     'originalQuestion',
     'refinedThinking',
     'refinedQuestions',
     'searchComplete',
     'thinkingProcess',
     'finalAnswer'
-  ];
+  ], []);
 
-  const resetSteps = () => {
+  const resetSteps = useCallback(() => {
     setCurrentStep(0);
     setShowSteps({
       originalQuestion: false,
@@ -36,7 +38,7 @@ export default function Home() {
       thinkingProcess: false,
       finalAnswer: false
     });
-  };
+  }, []);
 
   const handleStepComplete = useCallback(() => {
     setCurrentStep(prev => prev + 1);
@@ -49,7 +51,7 @@ export default function Home() {
         [steps[currentStep]]: true
       }));
     }
-  }, [currentStep]);
+  }, [currentStep, steps]);
 
   useEffect(() => {
     if (searchResult) {
@@ -87,7 +89,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
       {/* Logo Section */}
       <div className="mb-12">
-        <h1 className="text-6xl font-light tracking-tight text-white drop-shadow-2xl">
+        <h1 className="text-8xl font-light tracking-tight text-white drop-shadow-2xl">
             <span className="font-medium bg-gradient-to-r from-red-500 to-yellow-500 text-transparent bg-clip-text">Deep</span>
             <span className="font-medium bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">Search</span>
         </h1>
@@ -142,20 +144,20 @@ export default function Home() {
         {/* Search Buttons */}
         <div className="flex justify-center space-x-4 mt-8">
           <button 
-            className="px-6 py-3 bg-gray-900/80 backdrop-blur-md text-gray-100 rounded-lg hover:shadow-[0_2px_8px_rgba(59,130,246,0.3)] hover:bg-gray-800/90 transition-all duration-300 font-medium text-sm border border-gray-700/40"
+            className="btn-magical btn-shine btn-glow px-6 py-3 bg-gradient-to-r from-[#4f3bc1] via-[#7b5ffc] to-[#4f3bc1] text-white rounded-lg transition-all duration-300 font-medium text-sm border border-[#7b5ffc] hover:scale-105 hover:from-[#5a44d5] hover:via-[#8d74ff] hover:to-[#5a44d5]"
             onClick={handleSearch}
             disabled={isSearching}
           >
             深度思考
           </button>
           <button 
-            className="px-6 py-3 bg-gray-900/80 backdrop-blur-md text-gray-100 rounded-lg hover:shadow-[0_2px_8px_rgba(59,130,246,0.3)] hover:bg-gray-800/90 transition-all duration-300 font-medium text-sm border border-gray-700/40"
+            className="btn-magical btn-shine btn-glow px-6 py-3 bg-gradient-to-r from-[#c31432] via-[#ff3e4d] to-[#c31432] text-white rounded-lg transition-all duration-300 font-medium text-sm border border-[#ff3e4d] hover:scale-105 hover:from-[#d51838] hover:via-[#ff5262] hover:to-[#d51838]"
             disabled={isSearching}
           >
             交叉验证
           </button>
           <button 
-            className="px-6 py-3 bg-gray-900/80 backdrop-blur-md text-gray-100 rounded-lg hover:shadow-[0_2px_8px_rgba(59,130,246,0.3)] hover:bg-gray-800/90 transition-all duration-300 font-medium text-sm border border-gray-700/40"
+            className="btn-magical btn-shine btn-glow px-6 py-3 bg-gradient-to-r from-[#11998e] via-[#38ef7d] to-[#11998e] text-white rounded-lg transition-all duration-300 font-medium text-sm border border-[#38ef7d] hover:scale-105 hover:from-[#13ab9f] hover:via-[#4dff91] hover:to-[#13ab9f]"
             disabled={isSearching}
           >
             聚焦当下
@@ -167,28 +169,22 @@ export default function Home() {
           <div className="mt-8 w-full">
             <div className="bg-gray-900/80 backdrop-blur-md rounded-lg p-6 text-gray-100 border border-gray-700/40 transition-all duration-300">
               {/* Expand/Collapse Indicator */}
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-sm text-gray-400">
-                  思考过程
-                </span>
-                <svg 
-                  className={`w-5 h-5 text-gray-400 transform transition-transform`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
+              <div className="flex items-center justify-between cursor-pointer" onClick={() => setIsPanelOpen(!isPanelOpen)}>
+                <h3 className="text-base font-medium text-gray-300">思考过程</h3>
+                <div className={`transform transition-transform duration-300 ${isPanelOpen ? 'rotate-180' : ''}`}>
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
-
-              {/* Steps Content */}
-              <div className="space-y-4 text-sm">
+                
+              <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isPanelOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
                 {showSteps.originalQuestion && (
                   <div className="animate-fadeIn">
-                    <h3 className="text-sm text-gray-400 mb-2">原始问题</h3>
+                    <h3 className="text-sm text-blue-400 mb-2">原始问题</h3>
                     <TypeWriter 
                       text={searchResult.original_question}
-                      className="text-xs text-gray-400 mb-2"
+                      className="text-xs bg-gradient-to-r from-blue-500 to-blue-300 bg-clip-text text-transparent"
                       onComplete={handleStepComplete}
                     />
                   </div>
@@ -196,10 +192,10 @@ export default function Home() {
                 
                 {showSteps.refinedThinking && (
                   <div className="animate-fadeIn">
-                    <h3 className="text-sm text-gray-400 mb-2">问题思考</h3>
+                    <h3 className="text-sm text-purple-400 mb-2">问题思考</h3>
                     <TypeWriter 
                       text={searchResult.refined_thinking_process}
-                      className="text-xs text-gray-400 mb-2"
+                      className="text-xs bg-gradient-to-r from-purple-500 to-purple-300 bg-clip-text text-transparent"
                       onComplete={handleStepComplete}
                     />
                   </div>
@@ -207,13 +203,14 @@ export default function Home() {
 
                 {showSteps.refinedQuestions && (
                   <div className="animate-fadeIn">
-                    <h3 className="text-sm text-gray-400 mb-2">修正后问题</h3>
-                    <ul className="text-xs text-gray-400 mb-2">
+                    <h3 className="text-sm text-emerald-400 mb-2">修正后问题</h3>
+                    <ul className="space-y-1">
                       {searchResult.refined_questions.map((q, i) => (
                         <TypeWriter 
                           key={i}
                           text={q}
                           delay={30}
+                          className="text-xs bg-gradient-to-r from-emerald-500 to-emerald-300 bg-clip-text text-transparent"
                           onComplete={i === searchResult.refined_questions.length - 1 
                             ? handleStepComplete
                             : undefined}
@@ -227,7 +224,7 @@ export default function Home() {
                   <div className="animate-fadeIn">
                     <TypeWriter 
                       text="搜索完成"
-                      className="text-xs text-gray-400 mb-2"
+                      className="text-xs bg-gradient-to-r from-amber-500 to-amber-300 bg-clip-text text-transparent font-medium"
                       onComplete={handleStepComplete}
                     />
                   </div>
@@ -235,10 +232,10 @@ export default function Home() {
 
                 {showSteps.thinkingProcess && (
                   <div className="animate-fadeIn">
-                    <h3 className="text-sm text-gray-400 mb-2">整合结果</h3>
+                    <h3 className="text-sm text-rose-400 mb-2">整合结果</h3>
                     <TypeWriter 
                       text={searchResult.thinking_process}
-                      className="text-xs text-gray-400 mb-2"
+                      className="text-xs bg-gradient-to-r from-rose-500 to-rose-300 bg-clip-text text-transparent"
                       onComplete={handleStepComplete}
                     />
                   </div>
@@ -246,10 +243,10 @@ export default function Home() {
 
                 {showSteps.finalAnswer && (
                   <div className="animate-fadeIn mt-6 border-t border-gray-700/40 pt-4">
-                    <h3 className="text-sm text-gray-400 mb-2">最终答案</h3>
+                    <h3 className="text-sm text-cyan-400 mb-2">最终答案</h3>
                     <TypeWriter 
                       text={searchResult.final_answer}
-                      className="text-sm mb-3"
+                      className="text-sm bg-gradient-to-r from-cyan-500 via-cyan-400 to-cyan-300 bg-clip-text text-transparent font-medium"
                     />
                   </div>
                 )}
