@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能信息搜索系统</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        .input-section textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 100px;
+            margin-bottom: 10px;
+        }
+        .input-section button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .input-section button:hover {
+            background-color: #0056b3;
+        }
+        .result-section > div {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        .result-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>智能信息搜索系统</h1>
+        
+        <div class="input-section">
+            <textarea id="query-input" placeholder="请输入您的问题..."></textarea>
+            <button id="submit-btn">提交问题</button>
+        </div>
+
+        <div class="result-section">
+            <div>
+                <h3>原始问题</h3>
+                <pre id="original-question"></pre>
+            </div>
+            <div>
+                <h3>细化问题</h3>
+                <pre id="refined-questions"></pre>
+            </div>
+            <div>
+                <h3>问题分析</h3>
+                <pre id="refined-thinking-process"></pre>
+            </div>
+            <div>
+                <h3>搜索结果</h3>
+                <pre id="search-results"></pre>
+            </div>
+            <div>
+                <h3>思维过程</h3>
+                <pre id="thinking-process"></pre>
+            </div>
+            <div>
+                <h3>最终答案</h3>
+                <pre id="final-answer"></pre>
+            </div>
+            <div>
+                <h3>引用来源</h3>
+                <pre id="citations"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { InformationSearchAPI } from './test.js';
+
+        const api = new InformationSearchAPI();
+        const submitBtn = document.getElementById('submit-btn');
+        const queryInput = document.getElementById('query-input');
+
+        const elements = {
+            originalQuestion: document.getElementById('original-question'),
+            refinedQuestions: document.getElementById('refined-questions'),
+            searchResults: document.getElementById('search-results'),
+            refinedThinkingProcess: document.getElementById('refined-thinking-process'),
+            thinkingProcess: document.getElementById('thinking-process'),
+            finalAnswer: document.getElementById('final-answer'),
+            citations: document.getElementById('citations')
+        };
+
+        // 清空所有结果
+        function clearResults() {
+            Object.values(elements).forEach(element => {
+                element.textContent = '';
+            });
+        }
+
+        submitBtn.addEventListener('click', async () => {
+            const userInput = queryInput.value.trim();
+            if (!userInput) {
+                alert('请输入问题');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            clearResults();
+
+            try {
+                await api.sendQueryWithTypewriter(userInput, elements);
+            } catch (error) {
+                alert('处理查询时出错: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        // 支持按回车提交
+        queryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                submitBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
